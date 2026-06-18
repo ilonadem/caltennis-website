@@ -94,6 +94,16 @@
                                         <span>Dataset</span>
                                     </a>
                                 </span>
+                                <!-- Dataset Preview Link -->
+                                <span class="link-block">
+                                    <a href="https://huggingface.co/spaces/demalenk/caltennis-preview-viewer"
+                                        class="external-link button is-normal is-rounded is-dark">
+                                        <span class="icon">
+                                            <i class="fas fa-play-circle"></i>
+                                        </span>
+                                        <span>Dataset Preview</span>
+                                    </a>
+                                </span>
                             </div>
                         </div>
 
@@ -109,8 +119,8 @@
             <div class="columns is-centered has-text-centered">
                 <div class="content has-text-centered">
                     <p>
-                        <b>tl;dr</b> A large-scale, multi-view tennis video dataset with 11M+ frames from 40 players,
-                        enabling label-free evaluation of monocular 3D pose estimators via multi-view consistency.
+                        <b>tl;dr</b> A large-scale, multi-view tennis video dataset with 11M+ frames and
+                        novel human pose estimation evaluation framework.
                     </p>
                 </div>
             </div>
@@ -173,6 +183,14 @@
 
                     <div class="content has-text-justified">
                         <p>
+                            The Caltech Tennis Dataset (CalTennis) is the first benchmark to use multi-view, 
+                            real-world recordings of skilled human motion, capturing data underrepresented in 
+                            existing pose datasets and more representative of downstream motion-reconstruction applications. 
+                            It has significantly more depth variability and pose space coverage. 
+                            Despite containing 10x more frames than other real-world benchmarks, it is also  
+                            signifcantly cheaper than current MOCAP and real-world benchmark, requiring only every-day phones mounted on tripods.
+                        </p>
+                        <!-- <p>
                             CalTennis is captured using a lightweight, accessible protocol: standard iPhones (model
                             14 or newer) on fully extended 1.65 m MagSafe tripods (costing ~$40 each), placed at
                             standard locations around the court with no specialized equipment or expertise required.
@@ -188,7 +206,7 @@
                             lie 13.4&ndash;16.7 m from the camera, versus 4.5&ndash;5.8 m in Human3.6M. All
                             sessions were conducted under IRB approval with voluntary, informed consent, and we
                             blur all faces to protect player privacy.
-                        </p>
+                        </p> -->
                     </div>
 
                     <!-- Dataset comparison table -->
@@ -255,7 +273,7 @@
                                     <td class="has-text-centered"><strong>3365</strong></td>
                                     <td class="has-text-centered"><strong>13.4&ndash;16.7</strong></td>
                                     <td class="has-text-centered"><strong>85%</strong></td>
-                                    <td class="has-text-centered"><strong>$2</strong></td>
+                                    <td class="has-text-centered"><strong>$2k</strong></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -281,9 +299,9 @@
                     <div class="content has-text-justified">
                         <p>
                             To evaluate monocular pose estimators without ground-truth labels, we lift pose
-                            predictions from each camera into a shared global space-time reference frame.
+                            predictions from each camera into a shared global space-time reference frame:
                         </p>
-                        <p>
+                        <!-- <p>
                             <b>Spatial calibration.</b> We exploit the standardized geometry of the tennis court:
                             for each camera, we identify court line intersections in a video frame and minimize
                             reprojection error via PnP to recover extrinsics. Camera intrinsics are read directly
@@ -302,7 +320,7 @@
                             estimate, with covariance elongated along each camera's depth axis &mdash; the dominant
                             error mode in monocular reconstruction &mdash; to appropriately down-weight uncertain
                             depth estimates during fusion.
-                        </p>
+                        </p> -->
                     </div>
                     <!-- TODO: replace with Figure 3 / Figure 8 from paper (spatiotemporal calibration diagram) -->
                     <img src="static/images/spatiotemporal_calibration.png"
@@ -348,6 +366,10 @@
                                 whether a pose is balanced are unreliable for sport analysis.
                             </li>
                         </ul>
+                        <img src="static/images/multi_view_consistency.png"
+                         alt="Multi-view consistency"
+                         style="max-width:100%; height:auto; border-radius:12px;"
+                         loading="lazy">
                     </div>
                 </div>
             </div>
@@ -370,15 +392,21 @@
                             models, performance on CalTennis is substantially worse than on existing benchmarks,
                             reflecting the challenges of large depth range, fast athletic motion, and unscripted
                             behavior.
+
+                        </p>
+                        <p>
+
+                            We find that all models struggle with making consistent translation estimates, with average 
+                            error ranging from 0.9m - 3.6m, with 75% of translation errors within a 1m window. As the poses 
+                            contained in CalTennis span greater distances, pixel-level errors in pose estimates can result 
+                            in more severe mistakes in translation estimates, an effect that is not obvious from current benchmarks. 
+                            Qualitatively, we find that this results in a "pose drifting" effect, or oscillations in translation 
+                            estimates along each camera's depth axis. Models are much more consistent when it comes to pose estimates, 
+                            with about 11cm error between multi-view poses across all models. This suggests that these models are 
+                            more ready for downstream applications involving pose estimates alone, rather than those dependent on 
+                            accurate 3D identification of people in the scene.
                         </p>
                     </div>
-
-                    <!-- Results scatter plots -->
-                    <!-- TODO: replace with Figure 4 from paper -->
-                    <img src="static/images/model_perf_fig.png"
-                         alt="Multi-view consistency analysis: translation vs. pose error, and translation error vs. model size"
-                         style="max-width:100%; height:auto; border-radius:12px;"
-                         loading="lazy">
 
                     <div class="table-container mt-6">
                         <table class="table is-fullwidth is-striped is-hoverable is-bordered" style="font-size:0.9rem;">
@@ -448,54 +476,93 @@
                             </tbody>
                         </table>
                     </div>
-                    <p class="has-text-grey is-size-7 mt-2">
+                    <!-- <p class="has-text-grey is-size-7 mt-2">
                         Multi-view consistency metrics on CalTennis. Translation, Pose, MPJPE, PA-MPJPE, Foot-Height, and Stability are in mm; Foot-Vel is in m/s. Bold = best per column.
                     </p>
+                    <div>  <p> </p>   </div> -->
+                   
+                    <!-- <div class="content has-text-justified">
+                        <p>
+                            Model failure modes become more clear when we project pose estimates from one camera view onto the other to visualize
+                            cross-view inconsistency. Low-disagreement frames correspond to stationary,
+                            &ldquo;neutral&rdquo; poses equally visible from both cameras. High-disagreement
+                            frames occur on distant or dynamic poses with partial occlusion &mdash; particularly
+                            at feet and hands during strokes and footwork.
+                        </p>
+                    </div>
+                    TODO: replace with Figure 6 from paper (cross-view projection histogram + example frames) -->
+                    <!-- <img src="static/images/qualitative_fig.png"
+                         alt="Cross-view pose projections and PA-MPJPE histogram"
+                         style="max-width:100%; height:auto; border-radius:12px;"
+                         loading="lazy"> -->
+
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ===================== KEY FINDINGS ===================== -->
+    <!-- ===================== BENCHMARK RESULTS ===================== -->
     <section class="section">
         <div class="container is-max-desktop">
             <div class="columns is-centered has-text-centered">
                 <div class="column is-full-width">
-                    <h2 class="title is-3">Key Findings</h2>
+                    <h2 class="title is-3">Different Models Excel at Different Metrics</h2>
                     <div class="content has-text-justified">
                         <p>
-                            <b>No single model is best.</b> Different models excel at different aspects: PromptHMR
-                            leads on translation and joint-position metrics but has the largest per-video variance;
-                            WHAM excels at foot skating and pose drift at the cost of translation accuracy; GENMO
-                            is the most internally consistent across views. The relative model ordering changes with
-                            each metric.
-                        </p>
-                        <p>
-                            <b>Depth is the dominant failure mode.</b> All models struggle with metric-scale depth
-                            estimates, producing rapid, unrealistic jumps in estimated body position
-                            (&ldquo;pose drifting&rdquo;). At tennis-court distances of 13&ndash;17 m, even small
-                            pixel-level errors propagate into large translation errors. Depth and camera distance
-                            are the strongest predictors of per-frame failure across all models (Spearman
-                            r<sub>s</sub> up to +0.54).
-                        </p>
-                        <p>
-                            <b>Pose is more reliable than position.</b> Models achieve ~11 cm mean pose error
-                            relative to the pelvis across all models &mdash; good enough for activity recognition,
-                            coarse technique analysis, and gait-based identification. Applications depending on
-                            absolute depth, foot contact, or body shape remain unreliable.
-                        </p>
-                        <p>
-                            <b>Failures are model-intrinsic, not scene-determined.</b> Pairwise Jaccard similarity
-                            of failure frames is &le;0.30 for all model pairs, and no frame is flagged as hard by
-                            all five models. Each model fails on a largely disjoint subset of frames, consistent
-                            with model-specific architectural biases rather than universally hard scenes.
+                            We find that the most performant model depends on the metric and hardware limitations of the appplication.
+                            PromptHMR has the lowest translation inconsistency but also also the heaviest, while
+                            WHAM, which is second lowest, is also second lightest. These results highlight the trade-offs between 
+                            static pose accuracy and temporal/physical consistency
                         </p>
                     </div>
+
+                    <!-- Results scatter plots -->
+                    <!-- TODO: replace with Figure 4 from paper -->
+                    <img src="static/images/model_perf_fig.png"
+                         alt="Multi-view consistency analysis: translation vs. pose error, and translation error vs. model size"
+                         style="max-width:100%; height:auto; border-radius:12px;"
+                         loading="lazy">
+
+                    <p>
+                        We also compare the consistency of different models along foot skating, stability, and shape estimates. 
+                        In addition to there being no best model across the board, the relative ordering of model performance 
+                        for each metric changes as well.
+
+                    </p>
 
                     <!-- Consistency metrics figure -->
                     <!-- TODO: replace with Figure 5 from paper (foot height, stability, shape bar charts) -->
                     <img src="static/images/metrics_bar_plots.png"
                          alt="Consistency across foot height, stability, and shape metrics"
+                         style="max-width:100%; height:auto; border-radius:18px;"
+                         loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SHAPE CONSISTENCY ===================== -->
+    <section class="section">
+        <div class="container is-max-desktop">
+            <div class="columns is-centered has-text-centered">
+                <div class="column is-full-width">
+                    <h2 class="title is-3">Body Shape Inconsistency</h2>
+                    <div class="content has-text-justified">
+                        <p>
+                            An often-overlooked failure mode is shape inconsistency: the same person's estimated
+                            height, weight, and body proportions (SMPL-X &beta; parameters) vary significantly
+                            across camera views and across models. All five evaluated models produce inconsistent
+                            shape predictions, with up to 20 cm of height disagreement across views.
+                            PromptHMR achieves the most consistent multi-view shape reconstruction, likely
+                            because it conditions on 2D bounding boxes and keypoints. Models that produce
+                            consistent trajectories typically predict shape parameters once per video from the
+                            first frame, which is insufficient for accurate biomechanical analysis. Our findings
+                            motivate a more nuanced, video-level approach to shape prediction.
+                        </p>
+                    </div>
+                    <!-- TODO: replace with Figure 7 from paper (shape consistency body mesh figure) -->
+                    <img src="static/images/smplx_shape_reconstruction.png"
+                         alt="Shape consistency: SMPL-X body meshes across views for each model"
                          style="max-width:100%; height:auto; border-radius:12px;"
                          loading="lazy">
                 </div>
@@ -532,36 +599,6 @@
         }
     </style>
 
-    <!-- ===================== SHAPE CONSISTENCY ===================== -->
-    <section class="section">
-        <div class="container is-max-desktop">
-            <div class="columns is-centered has-text-centered">
-                <div class="column is-full-width">
-                    <h2 class="title is-3">Body Shape Inconsistency</h2>
-                    <div class="content has-text-justified">
-                        <p>
-                            An often-overlooked failure mode is shape inconsistency: the same person's estimated
-                            height, weight, and body proportions (SMPL-X &beta; parameters) vary significantly
-                            across camera views and across models. All five evaluated models produce inconsistent
-                            shape predictions, with up to 20 cm of height disagreement across views.
-                            PromptHMR achieves the most consistent multi-view shape reconstruction, likely
-                            because it conditions on 2D bounding boxes and keypoints. Models that produce
-                            consistent trajectories typically predict shape parameters once per video from the
-                            first frame, which is insufficient for accurate biomechanical analysis. Our findings
-                            motivate a more nuanced, video-level approach to shape prediction.
-                        </p>
-                    </div>
-                    <!-- TODO: replace with Figure 7 from paper (shape consistency body mesh figure) -->
-                    <img src="static/images/smplx_shape_reconstruction.png"
-                         alt="Shape consistency: SMPL-X body meshes across views for each model"
-                         style="max-width:100%; height:auto; border-radius:12px;"
-                         loading="lazy">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===================== CROSS-VIEW PROJECTIONS ===================== -->
     <section class="section">
         <div class="container is-max-desktop">
             <div class="columns is-centered has-text-centered">
@@ -569,7 +606,7 @@
                     <h2 class="title is-3">Qualitative Examples</h2>
                     <div class="content has-text-justified">
                         <p>
-                            We project pose estimates from one camera view onto the other to visualize
+                            Model failure modes become more clear when we project pose estimates from one camera view onto the other to visualize
                             cross-view inconsistency. Low-disagreement frames correspond to stationary,
                             &ldquo;neutral&rdquo; poses equally visible from both cameras. High-disagreement
                             frames occur on distant or dynamic poses with partial occlusion &mdash; particularly
@@ -581,6 +618,34 @@
                          alt="Cross-view pose projections and PA-MPJPE histogram"
                          style="max-width:100%; height:auto; border-radius:12px;"
                          loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== KEY FINDINGS ===================== -->
+    <section class="section">
+        <div class="container is-max-desktop">
+            <div class="columns is-centered has-text-centered">
+                <div class="column is-full-width">
+                    <h2 class="title is-3">Key Findings</h2>
+                    <div class="content has-text-justified">
+                        <p>
+                            <b>No single model is best.</b> Different models excel at different aspects: PromptHMR
+                            leads on translation and joint-position metrics but has the largest per-video variance;
+                            WHAM excels at foot skating and pose drift at the cost of translation accuracy; GENMO
+                            is the most internally consistent across views. The relative model ordering changes with
+                            each metric.
+                        </p>
+                        <p>
+                            <b>Three quantities remain unreliable across every model we tested:</b> absolute distance and depth, 
+                            ground-contact detection, and body shape (limb lengths, height, proportions). These are exactly 
+                            the quantities that clinical biomechanical analysis, force and balance estimation, 
+                            fine-grained sports analytics, pedestrian intent prediction, and forensic stride-length measurement 
+                            most directly depend on.
+                        </p>
+                    </div>
+
                 </div>
             </div>
         </div>
